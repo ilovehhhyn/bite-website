@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nibble by Bite Labs</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Nibble by Bite Labs: the smoothest reinforcement learning training for any model.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: one white scroll in five framed sections, after typesafe.ai: tiny typewriter labels and
+   crop marks, giant skinny headlines, small columns of plain text, and white windows for the work. */
+:root {
+  --paper: #FFFFFF;
+  --ink: #141414;
+  --ink-soft: #5E5E5B;
+  --hair: #E4E3DF;
+  --sage: #C6DDA8;
+  --sage-ink: #20301A;
+  --danger: #A3271C;
+  --bisque-1: #FFFFFF;
+  --bisque-2: #F2F0EB;
+  --bisque-3: #DEDAD2;
+  --celadon-1: #E6E7E2;
+  --celadon-2: #B9BBB4;
+  --celadon-3: #8E918A;
+  --tenmoku-1: #5A5A57;
+  --tenmoku-2: #222221;
+  --tenmoku-3: #0B0B0B;
+  --typewriter: "American Typewriter", "Courier Prime", "Courier New", monospace;
+  --code: "Courier Prime", "Courier New", ui-monospace, monospace;
+  --skinny: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --gutter: clamp(16px, 4vw, 48px);
+  color-scheme: light;
+}
+
+[hidden] { display: none !important; }
+*, *::before, *::after { box-sizing: border-box; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-stopped { overflow: clip; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--skinny);
+  font-weight: 300;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: inherit; }
+p, h1, h2, h3 { margin: 0; }
+h1, h2, h3 { text-wrap: balance; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+.label { font-family: var(--typewriter); font-weight: 300; font-size: 0.8rem; letter-spacing: 0.02em; color: var(--ink-soft); }
+.headline { font-family: var(--skinny); font-weight: 200; font-size: clamp(2.6rem, 7.4vw, 6.4rem); line-height: 0.98; letter-spacing: -0.035em; text-align: center; }
+.headline-small { font-size: clamp(2.1rem, 5vw, 4.2rem); }
+.lede { font-size: clamp(1.1rem, 1.6vw, 1.3rem); line-height: 1.5; color: var(--ink-soft); }
+.note { font-family: var(--typewriter); font-weight: 300; font-size: 0.78rem; line-height: 1.6; color: var(--ink-soft); max-width: 78ch; }
+
+/* Top bar */
+.bar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-inline: var(--gutter);
+  padding-block: 0.6rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.wordmark { font-family: var(--typewriter); font-weight: 300; font-size: 1rem; text-decoration: none; letter-spacing: 0.04em; }
+.nav { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.nav a { font-family: var(--typewriter); font-weight: 300; font-size: 0.8rem; text-decoration: none; border: 1px solid var(--ink); padding: 0.2rem 0.55rem; background: var(--paper); }
+.nav a:hover { background: var(--ink); color: var(--paper); }
+.nav a.dark { background: var(--ink); color: var(--paper); }
+
+/* Sections are framed with crop marks at their four corners. */
+main { padding-inline: var(--gutter); }
+.frame {
+  position: relative;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(3rem, 8vw, 6.5rem) clamp(0.5rem, 3vw, 2.5rem);
+  display: grid;
+  gap: clamp(2rem, 5vw, 3.5rem);
+  --mark: 14px;
+  background:
+    linear-gradient(var(--ink), var(--ink)) top left / var(--mark) 1px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) top left / 1px var(--mark) no-repeat,
+    linear-gradient(var(--ink), var(--ink)) top right / var(--mark) 1px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) top right / 1px var(--mark) no-repeat,
+    linear-gradient(var(--ink), var(--ink)) bottom left / var(--mark) 1px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) bottom left / 1px var(--mark) no-repeat,
+    linear-gradient(var(--ink), var(--ink)) bottom right / var(--mark) 1px no-repeat,
+    linear-gradient(var(--ink), var(--ink)) bottom right / 1px var(--mark) no-repeat;
+}
+.frame + .frame { margin-top: clamp(1.5rem, 4vw, 3rem); }
+.frame-tag { position: absolute; top: 0.6rem; left: 1.4rem; }
+.frame-tag-right { position: absolute; top: 0.6rem; right: 1.4rem; }
+
+/* Landing */
+.landing { justify-items: center; text-align: center; gap: clamp(1.5rem, 3vw, 2.4rem); padding-top: clamp(2.5rem, 5vw, 4rem); }
+.notice { border: 1px solid var(--ink); font-family: var(--code); font-size: 0.8rem; text-align: center; min-width: min(20rem, 100%); }
+.notice-head { background: var(--ink); color: var(--paper); padding: 0.15rem 0.6rem; text-align: left; }
+.notice-body { padding: 0.5rem 0.9rem 0.6rem; display: grid; gap: 0.3rem; }
+.dotted { font-family: var(--typewriter); font-weight: 300; font-size: 0.95rem; }
+.plate { width: min(780px, 92vw); }
+.tagline { font-family: var(--skinny); font-weight: 200; font-size: clamp(2.4rem, 6.6vw, 5.6rem); letter-spacing: -0.035em; line-height: 1; }
+.links { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem 2.5rem; }
+.links a { font-family: var(--skinny); font-weight: 300; font-size: clamp(1.2rem, 2vw, 1.6rem); text-underline-offset: 0.3em; text-decoration-thickness: 1px; }
+
+/* Columns of short text, each under a typewriter label */
+.columns { display: grid; grid-template-columns: repeat(var(--count, 3), minmax(0, 1fr)); gap: 1.5rem clamp(1.5rem, 3vw, 3rem); }
+.column { display: grid; gap: 0.7rem; align-content: start; }
+.column p { color: var(--ink); font-size: 1rem; }
+.column.big p { font-size: clamp(1.1rem, 1.7vw, 1.35rem); line-height: 1.45; }
+.rule-top { border-top: 1px solid var(--ink); padding-top: 0.8rem; }
+
+/* Windows: a black title bar over a white body, like the slides' terminals turned to paper. */
+.window { border: 1px solid var(--ink); background: var(--paper); min-width: 0; box-shadow: 6px 6px 0 var(--hair); }
+.window-bar { display: flex; justify-content: space-between; gap: 1rem; align-items: center; background: var(--ink); color: var(--paper); font-family: var(--code); font-size: 0.82rem; padding: 0.3rem 0.75rem; }
+.window-bar button { font: inherit; color: var(--paper); background: transparent; border: 1px solid rgba(255, 255, 255, 0.5); padding: 0 0.5rem; cursor: pointer; }
+.window-body { padding: clamp(1rem, 2.5vw, 1.6rem); display: grid; gap: 1rem; min-width: 0; }
+
+/* API */
+.api { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+.slab { width: min(520px, 100%); justify-self: center; }
+pre.code { margin: 0; font-family: var(--code); font-size: 0.92rem; line-height: 1.6; overflow-x: auto; color: var(--ink); }
+pre.code .c { color: #8A8A85; font-style: italic; }
+pre.code .s { color: #3B5A2B; }
+pre.code .k { font-weight: 700; }
+
+/* Results: the slides' bar charts, with every bar a slab of porcelain. */
+.stat-headline { font-family: var(--skinny); font-weight: 200; font-size: clamp(3rem, 10vw, 8.5rem); line-height: 0.92; letter-spacing: -0.045em; }
+.charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.6rem; align-items: start; }
+.chart-title { font-family: var(--code); font-weight: 700; font-size: 0.95rem; }
+.bars { display: grid; gap: 0.55rem; }
+.bar-row { display: grid; grid-template-columns: minmax(7.5rem, 11.5rem) minmax(0, 1fr); gap: 0.8rem; align-items: center; }
+.bar-name { font-family: var(--skinny); font-weight: 300; font-size: 1rem; color: #8B8B87; }
+.bar-row.nibble .bar-name { color: var(--ink); font-weight: 700; }
+.bar-track { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+.slab-bar {
+  position: relative;
+  height: 26px;
+  width: calc((100% - 5.6rem) * var(--fraction));
+  flex: 0 0 auto;
+  border-radius: 3px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--glaze-1) 0%, var(--glaze-2) 46%, var(--glaze-3) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.12),
+    0 1px 0 rgba(0, 0, 0, 0.06),
+    0 7px 12px -8px rgba(0, 0, 0, 0.45);
+}
+/* The glaze highlight: a soft specular band near the top edge of each slab. */
+.slab-bar::before { content: ""; position: absolute; left: 4px; right: 4px; top: 3px; height: 7px; border-radius: 3px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0)); }
+/* A glint that crosses the slab once when the chart comes into view. */
+.slab-bar::after { content: ""; position: absolute; top: 0; bottom: 0; width: 30%; left: 0; background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.75), transparent); transform: translateX(var(--glint, -120%)) skewX(-12deg); }
+.slab-bar.bisque { --glaze-1: var(--bisque-1); --glaze-2: var(--bisque-2); --glaze-3: var(--bisque-3); border: 1px solid #D8D4CB; }
+.slab-bar.celadon { --glaze-1: var(--celadon-1); --glaze-2: var(--celadon-2); --glaze-3: var(--celadon-3); }
+.slab-bar.tenmoku { --glaze-1: var(--tenmoku-1); --glaze-2: var(--tenmoku-2); --glaze-3: var(--tenmoku-3); }
+.slab-bar.tenmoku::before { background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0)); }
+.bar-value { font-family: var(--code); font-size: 1.05rem; white-space: nowrap; color: #8B8B87; }
+.bar-row.nibble .bar-value { background: var(--sage); color: var(--sage-ink); font-weight: 700; padding: 0.05rem 0.45rem; }
+.callout { font-family: var(--code); font-size: 0.95rem; }
+.chip { background: var(--sage); color: var(--sage-ink); font-weight: 700; padding: 0.05rem 0.4rem; }
+.prompt { font-family: var(--code); font-size: 0.9rem; color: var(--ink-soft); }
+.cursor { display: inline-block; width: 0.6em; border-bottom: 2px solid var(--ink); animation: blink 1.1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+/* Monitoring */
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--hair); }
+.stat { display: grid; gap: 0.4rem; padding: 1.3rem 1.1rem; align-content: start; }
+.stat + .stat { border-left: 1px solid var(--hair); }
+.stat-value { font-family: var(--skinny); font-weight: 200; font-size: clamp(2.6rem, 5vw, 3.8rem); line-height: 1; letter-spacing: -0.03em; }
+.stat p { font-size: 0.95rem; color: var(--ink-soft); }
+.tools { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 1.6rem; align-items: start; }
+.field { display: grid; gap: 0.25rem; min-width: 0; }
+.field label { font-family: var(--typewriter); font-weight: 300; font-size: 0.78rem; color: var(--ink-soft); }
+.field input, .field select { font-family: var(--code); font-size: 1rem; color: var(--ink); background: var(--paper); border: 1px solid var(--ink); border-radius: 0; padding: 0.35rem 0.5rem; width: 100%; min-width: 0; }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
+.fields .wide { grid-column: 1 / -1; }
+.saving { font-family: var(--skinny); font-weight: 200; font-size: clamp(2.8rem, 6vw, 4.2rem); letter-spacing: -0.03em; line-height: 1; }
+.form-error { color: var(--danger); font-family: var(--code); font-size: 0.85rem; }
+.button { font-family: var(--code); font-size: 0.85rem; background: var(--paper); color: var(--ink); border: 1px solid var(--ink); padding: 0.3rem 0.7rem; cursor: pointer; }
+.button:hover { background: var(--ink); color: var(--paper); }
+.controls { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: end; }
+.controls .field { width: 11rem; }
+.formula { font-family: var(--code); font-size: 0.9rem; line-height: 1.7; background: #FAFAF8; border: 1px solid var(--hair); padding: 0.8rem 1rem; overflow-x: auto; white-space: pre; }
+.readout { font-family: var(--code); font-size: 0.92rem; min-height: 1.5em; }
+.chart-box { overflow-x: auto; }
+.chart-box svg { display: block; width: 100%; min-width: 520px; height: auto; }
+.verdict { font-family: var(--code); font-size: 1rem; }
+
+/* Reach out */
+.reach { justify-items: center; text-align: center; }
+.reach-button { font-family: var(--typewriter); font-weight: 300; font-size: clamp(1rem, 1.6vw, 1.2rem); text-decoration: none; background: var(--ink); color: var(--paper); border: 1px solid var(--ink); padding: 0.9rem 1.6rem; }
+.reach-button:hover { background: var(--paper); color: var(--ink); }
+
+/* Footer */
+footer { padding-inline: var(--gutter); }
+.footer-inner { max-width: 1240px; margin: clamp(2rem, 5vw, 4rem) auto 0; padding-block: 2rem 2.5rem; border-top: 1px solid var(--ink); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem 2rem; }
+
+@media (max-width: 900px) {
+  .api, .charts, .tools { grid-template-columns: minmax(0, 1fr); }
+  .columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat:nth-child(3) { border-left: 0; }
+  .stat:nth-child(n + 3) { border-top: 1px solid var(--hair); }
+}
+@media (max-width: 560px) {
+  .columns, .fields { grid-template-columns: minmax(0, 1fr); }
+  .stats { grid-template-columns: minmax(0, 1fr); }
+  .stat + .stat { border-left: 0; border-top: 1px solid var(--hair); }
+  .bar-row { grid-template-columns: minmax(0, 1fr); gap: 0.25rem; }
+  .nav a:not(.dark) { display: none; }
+  .frame-tag-right { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cursor { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <a class="wordmark" href="#top">bite labs</a>
+  <nav class="nav" aria-label="Sections">
+    <a href="#philosophy">philosophy</a>
+    <a href="#api">api</a>
+    <a href="#results">results</a>
+    <a href="#monitoring">monitoring</a>
+    <a class="dark" href="#reach-out">reach out</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- 00 &#183; landing -->
+<section class="frame landing" id="top" aria-label="Bite Labs">
+  <span class="label frame-tag">bl.00</span>
+  <span class="label frame-tag-right">nibble 0.1</span>
+  <div class="notice" role="note">
+    <div class="notice-head">oct 2026 &middot; nibble</div>
+    <div class="notice-body"><span>1.8&times; faster than synchronous rl</span><a href="#results">see the results</a></div>
+  </div>
+  <p class="dotted">introducing nibble &middot;&middot;&middot;&middot;&middot;&middot; the reinforcement learning api</p>
+  <img class="plate" src="img/plate.webp" alt="An oval ceramic plate with a piped rim, stamped bite labs in the middle" width="1400" height="1011">
+  <h1 class="tagline">smoothest training for any model</h1>
+  <div class="links">
+    <a href="#api">read the api</a>
+    <a href="#results">see the results</a>
+  </div>
+</section>
+
+<!-- 01 &#183; philosophy -->
+<section class="frame" id="philosophy" aria-labelledby="philosophy-title">
+  <span class="label frame-tag">bl.01 / philosophy</span>
+  <h2 class="headline" id="philosophy-title">gpus for everyone, not just the top labs</h2>
+  <div class="columns" style="--count: 3">
+    <div class="column big">
+      <span class="label">the problem</span>
+      <p>Today the best reinforcement learning stacks live inside a few labs with thousands of GPUs. Everyone else rebuilds the same plumbing, loses days to out-of-memory errors and pays for cards that sit idle.</p>
+    </div>
+    <div class="column big">
+      <span class="label">our bet</span>
+      <p>Training should be transparent, fast and cheap for any lab, with eight GPUs or eight thousand. We run the hard parts so that every team can train at the frontier.</p>
+    </div>
+    <div class="column big">
+      <span class="label">and</span>
+      <p>Training should be fun again. You write the reward and the idea. We handle the out-of-memory errors, the placement and the failures.</p>
+    </div>
+  </div>
+  <div class="columns" style="--count: 4">
+    <div class="column rule-top"><span class="label">transparent</span><p>You see the code that scores your model, the GPU each role runs on, and every failure with its cause.</p></div>
+    <div class="column rule-top"><span class="label">fast</span><p>Asynchronous by default. Generation never waits for the trainer, and unfinished answers keep their cache when the weights update.</p></div>
+    <div class="column rule-top"><span class="label">cheap</span><p>No idle GPUs and no work computed twice, and bad runs are stopped early. On your own GPUs, the api is free.</p></div>
+    <div class="column rule-top"><span class="label">fun</span><p>Five fields start a run. You watch each update land, instead of babysitting a job that died at hour six.</p></div>
+  </div>
+</section>
+
+<!-- 02 &#183; api -->
+<section class="frame" id="api" aria-labelledby="api-title">
+  <span class="label frame-tag">bl.02 / api</span>
+  <h2 class="headline headline-small" id="api-title">five fields to start. every setting when you need it.</h2>
+  <div class="api">
+    <img class="slab" src="img/slab.webp" alt="A slab of raw clay stamped nibble api" width="1100" height="1100" loading="lazy">
+    <div class="window">
+      <div class="window-bar"><span>~/nibble &middot; train.py &middot; sketch</span><button type="button" data-copy="api-code">copy</button></div>
+      <div class="window-body">
+<pre class="code" id="api-code"><span class="k">import</span> nibble
+
+<span class="c"># five fields start a run</span>
+run = nibble.train(
+    model     = <span class="s">"r1-distill-qwen-1.5b"</span>,
+    reward    = my_reward,      <span class="c"># answer -> score</span>
+    dataset   = <span class="s">"deepscaler"</span>,
+    algorithm = <span class="s">"grpo"</span>,         <span class="c"># or "ppo"</span>
+    gpus      = 4,              <span class="c"># yours or ours</span>
+)
+
+<span class="c"># any other setting, when you need it</span>
+run = nibble.train(
+    ...,
+    sampling = {<span class="s">"temperature"</span>: 1.0,
+                <span class="s">"max_new_tokens"</span>: 32768},
+    batch    = {<span class="s">"prompts"</span>: 64,
+                <span class="s">"answers_per_prompt"</span>: 8},
+    schedule = {<span class="s">"updates"</span>: 15,
+                <span class="s">"max_staleness"</span>: 2},
+    monitor  = {<span class="s">"alarm"</span>: 0.999},
+)
+
+run.watch()    <span class="c"># each update as it lands</span>
+run.report()   <span class="c"># hours, cost, accuracy</span></pre>
+      </div>
+    </div>
+  </div>
+  <div class="columns" style="--count: 3">
+    <div class="column rule-top"><span class="label">simple</span><p>Model, reward, data, algorithm and GPUs. That is a complete run.</p></div>
+    <div class="column rule-top"><span class="label">granular</span><p>Every setting the trainer honours is one key away: sampling, batch shape, staleness, caches, placement.</p></div>
+    <div class="column rule-top"><span class="label">safe</span><p>A misspelled key or a clash between settings fails before launch, with the field and the fix in the message.</p></div>
+  </div>
+  <p class="note">The code above is a sketch of the api's shape. Field names may change before release.</p>
+</section>
+
+<!-- 03 &#183; results -->
+<section class="frame" id="results" aria-labelledby="results-title">
+  <span class="label frame-tag">bl.03 / results</span>
+  <div>
+    <h2 class="stat-headline" id="results-title">1.8&times; faster,<br>45% cheaper.</h2>
+    <p class="note" style="margin-top: 1rem">*ppo, 15 updates, against synchronous rl on the same 3 &times; A100 80GB. cheaper means fewer gpu-hours. <a href="#proof">proof below</a>.</p>
+  </div>
+  <p class="label" id="proof">vs open-source async rl and synchronous rl &middot; deepseek-r1-distill-qwen-1.5b &middot; 32k-token reasoning &middot; 15 rl updates</p>
+  <div class="charts">
+    <div class="window">
+      <div class="window-bar"><span>~/nibble</span><span>time to train</span></div>
+      <div class="window-body">
+        <p class="chart-title">ppo &middot; hours to train</p>
+        <div class="bars" data-chart="ppo-hours"></div>
+        <p class="callout">&gt; 1.8&times; faster than sync &middot; 7% faster than open-source async</p>
+        <p class="chart-title">grpo &middot; hours to train</p>
+        <div class="bars" data-chart="grpo-hours"></div>
+        <p class="callout">&gt; 1.6&times; faster than sync &middot; 11% faster than open-source async</p>
+      </div>
+    </div>
+    <div class="window">
+      <div class="window-bar"><span>~/nibble</span><span>cost per run</span></div>
+      <div class="window-body">
+        <p class="chart-title">ppo &middot; gpu-hours per run</p>
+        <div class="bars" data-chart="ppo-cost"></div>
+        <p class="callout">&gt; 45% cheaper than sync &middot; 7% cheaper than open-source async</p>
+        <p class="chart-title">grpo &middot; gpu-hours per run</p>
+        <div class="bars" data-chart="grpo-cost"></div>
+        <p class="callout">&gt; 35% cheaper than sync &middot; 7% cheaper than open-source async</p>
+        <p class="note">gpu-hours = 3 gpus &times; hours to train. At $2.50 per A100-hour, a ppo run costs $21.00 with nibble, against $38.25 synchronous.</p>
+      </div>
+    </div>
+    <div class="window">
+      <div class="window-bar"><span>~/nibble</span><span>eval &middot; aime 2024 &middot; ppo</span></div>
+      <div class="window-body">
+        <p class="chart-title">ppo &middot; aime 2024 solved</p>
+        <div class="bars" data-chart="aime"></div>
+        <p class="callout">&gt; highest of the three</p>
+      </div>
+    </div>
+    <div class="window">
+      <div class="window-bar"><span>~/nibble</span><span>bench --same-engine-settings</span></div>
+      <div class="window-body">
+        <p class="chart-title">trained tokens / second &middot; higher is better</p>
+        <div class="bars" data-chart="throughput"></div>
+        <p class="callout"><span class="chip">+6.6% vs open-source async, same settings</span> +15.9% vs its defaults</p>
+        <p class="prompt">guest@nibble:~$ every nibble run beat every baseline run<span class="cursor" aria-hidden="true"></span></p>
+        <p class="note">frequent updates &middot; 8 prompts &times; 8 answers per update &middot; 15 grpo updates &middot; 2&ndash;3 runs per system &middot; mean of steps 2&ndash;15. nibble's engine tuning is applied to the baseline here, so the gap is nibble itself: unfinished answers keep their kv cache when the weights update.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 &#183; monitoring -->
+<section class="frame" id="monitoring" aria-labelledby="monitoring-title">
+  <span class="label frame-tag">bl.04 / monitoring</span>
+  <h2 class="headline headline-small" id="monitoring-title">strong monitorability, without slowing you down</h2>
+  <div class="columns" style="--count: 3">
+    <div class="column big"><span class="label">1 / catch bad runs</span><p>A timeout can look like a wrong answer, and a broken grader can look like a bad policy. We catch the change while it is still cheap, so you stop paying for steps that teach the model nothing.</p></div>
+    <div class="column big"><span class="label">2 / bayesian, not guesswork</span><p>Every step updates the probability that your run has been polluted. The alarm fires at 99.9%, so a false alarm before a real change is at most a 0.1% chance.</p></div>
+    <div class="column big"><span class="label">3 / off the training path</span><p>The check reads the records your run already writes, in a separate process. The training loop never waits for it.</p></div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="stat-value">~16%</span><p>of audited early trajectories held a sandbox failure in one team's coding-agent training.</p></div>
+    <div class="stat"><span class="stat-value">6&ndash;7%</span><p>of rollouts were invalidated by timeouts alone, before that team fixed its images.</p></div>
+    <div class="stat"><span class="stat-value">&lt;2%</span><p>sandbox error rate after the fixes. The problems were fixable once someone saw them.</p></div>
+    <div class="stat"><span class="stat-value">1 step</span><p>median alarm delay once failures rose to 20%, in 50 simulated runs.</p></div>
+  </div>
+  <p class="note">The first three figures are one team's reported rollout statistics (KAT-Coder-V2.5 report, section 4.2.2), not an industry-wide rate, and the improvement came from that team's own fixes. The alarm delay is from simulated runs: at a 5% failure rate, 43 of 50 runs raised no alarm within 150 steps.</p>
+
+  <div class="tools">
+    <div class="window">
+      <div class="window-bar"><span>~/nibble</span><span>savings per incident</span></div>
+      <div class="window-body">
+        <form class="fields" id="calculator" autocomplete="off">
+          <div class="field"><label for="c-gpus">gpus allocated</label><input id="c-gpus" inputmode="numeric" value="64"></div>
+          <div class="field"><label for="c-rate">usd per gpu-hour</label><input id="c-rate" inputmode="decimal" value="2.50"></div>
+          <div class="field wide"><label for="c-without">hours until someone notices, without an alarm</label><input id="c-without" inputmode="decimal" value="8"></div>
+          <div class="field"><label for="c-alert">hours until our alarm</label><input id="c-alert" inputmode="decimal" value="0.5"></div>
+          <div class="field"><label for="c-recover">hours to act and recover</label><input id="c-recover" inputmode="decimal" value="0.5"></div>
+          <p class="form-error wide" id="c-error" hidden>every field needs a non-negative number, with at least one whole gpu</p>
+        </form>
+        <div>
+          <p class="label">gpu spend avoided per incident</p>
+          <p class="saving" id="c-value" aria-live="polite">$1,120</p>
+          <p class="note" id="c-formula">64 gpus &times; $2.50 per hour &times; 7 hours of avoided waste</p>
+        </div>
+        <p class="note">gpus &times; rate &times; max(0, hours without an alarm &minus; hours to the alarm &minus; recovery hours). The rate and times are assumptions you can change, not a quote or a measurement. It is gross compute value: labour, storage and earlier lost work are not counted.</p>
+      </div>
+    </div>
+
+    <div class="window">
+      <div class="window-bar"><span>~/nibble</span><span>is my run polluted?</span></div>
+      <div class="window-body">
+        <div class="controls">
+          <div class="field"><label for="b-rate">failure rate after the fault</label>
+            <select id="b-rate"><option value="0.05">5%</option><option value="0.10">10%</option><option value="0.16" selected>16%</option><option value="0.20">20%</option><option value="0.30">30%</option></select>
+          </div>
+          <div class="field"><label for="b-units">rollouts per step</label>
+            <select id="b-units"><option value="16">16</option><option value="32" selected>32</option><option value="64">64</option></select>
+          </div>
+          <button class="button" type="button" id="b-new">new run</button>
+        </div>
+        <p class="verdict" id="b-verdict" aria-live="polite"></p>
+        <div class="chart-box"><svg id="b-chart" viewBox="0 0 640 250" role="img" aria-label="Probability that the run has been polluted, by training step"></svg></div>
+        <p class="readout" id="b-readout"></p>
+        <div class="formula">rates:      healthy p&#8320; = 2%,  broken p&#8321; = 16%,  hazard &rho; = 0.001
+evidence:   L = (p&#8321;/p&#8320;)^k &middot; ((1&minus;p&#8321;)/(1&minus;p&#8320;))^(n&minus;k)
+prior:      q = p&#8348;&#8331;&#8321; + (1 &minus; p&#8348;&#8331;&#8321;) &middot; &rho;
+posterior:  p&#8348; = q&middot;L / (q&middot;L + 1 &minus; q)
+alarm:      p&#8348; &ge; 0.999  &rArr;  P(alarm before the change) &le; 0.1%</div>
+        <p class="note">k failed rollouts out of n in a step. This is the Shiryaev change detector. In production each step's evidence is also divided by a design effect, so a burst inside one prompt group counts once. The simulation draws failures at 2% before the fault at step 150 and at the chosen rate after it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 &#183; reach out -->
+<section class="frame reach" id="reach-out" aria-labelledby="reach-title">
+  <span class="label frame-tag">bl.05 / reach out</span>
+  <h2 class="headline" id="reach-title">reach out</h2>
+  <p class="lede">Want early access, or want to train with us? Say hi.</p>
+  <a class="reach-button" href="https://x.com/helentomato0o" target="_blank" rel="noopener">message @helentomato0o on x</a>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <span class="wordmark">bite labs</span>
+    <span class="label">smoothest training for any model &middot; &copy; 2026</span>
+    <span class="label" aria-hidden="true">Yml0ZSBsYWJz</span>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+<script>
+"use strict";
+
+const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// The slides' bar charts. Each row is [name, value, glaze]; bars grow from zero to scale.
+const Charts = (() => {
+  const SYNC = "synchronous rl";
+  const ASYNC = "open-source async rl";
+  const GPUS_PER_RUN = 3;
+  const hours = (value) => `${value.toFixed(1)} h`;
+  const gpuHours = (value) => `${value.toFixed(1)} gpu-h`;
+  const DATA = {
+    "ppo-hours": { format: hours, rows: [[SYNC, 5.1, "bisque"], [ASYNC, 3.0, "celadon"], ["nibble", 2.8, "tenmoku"]] },
+    "grpo-hours": { format: hours, rows: [[SYNC, 4.0, "bisque"], [ASYNC, 2.8, "celadon"], ["nibble", 2.6, "tenmoku"]] },
+    "ppo-cost": { format: gpuHours, rows: [[SYNC, 5.1 * GPUS_PER_RUN, "bisque"], [ASYNC, 3.0 * GPUS_PER_RUN, "celadon"], ["nibble", 2.8 * GPUS_PER_RUN, "tenmoku"]] },
+    "grpo-cost": { format: gpuHours, rows: [[SYNC, 4.0 * GPUS_PER_RUN, "bisque"], [ASYNC, 2.8 * GPUS_PER_RUN, "celadon"], ["nibble", 2.6 * GPUS_PER_RUN, "tenmoku"]] },
+    "aime": { format: (value) => `${value.toFixed(1)}%`, rows: [[SYNC, 29.0, "bisque"], [`${ASYNC} (default)`, 26.5, "celadon"], ["nibble", 30.8, "tenmoku"]] },
+    "throughput": { format: (value) => value.toLocaleString("en-US"), rows: [[`${ASYNC} \u00b7 default settings`, 5154, "bisque"], [`${ASYNC} \u00b7 nibble's engine`, 5603, "celadon"], ["nibble", 5971, "tenmoku"]] },
+  };
+
+  function render(element) {
+    const chart = DATA[element.dataset.chart];
+    if (chart === undefined) throw new Error(`unknown chart ${element.dataset.chart}`);
+    const maximum = Math.max(...chart.rows.map(([, value]) => value));
+    for (const [name, value, glaze] of chart.rows) {
+      const row = document.createElement("div");
+      row.className = `bar-row${name === "nibble" ? " nibble" : ""}`;
+      row.innerHTML = `<span class="bar-name"></span><span class="bar-track"><span class="slab-bar ${glaze}"></span><span class="bar-value"></span></span>`;
+      row.querySelector(".bar-name").textContent = name;
+      row.querySelector(".bar-value").textContent = chart.format(value);
+      const slab = row.querySelector(".slab-bar");
+      slab.style.setProperty("--fraction", String(value / maximum));
+      slab.setAttribute("role", "img");
+      slab.setAttribute("aria-label", `${name}: ${chart.format(value)}`);
+      element.append(row);
+    }
+  }
+
+  function start() {
+    for (const element of document.querySelectorAll("[data-chart]")) render(element);
+  }
+
+  return { start };
+})();
+
+// Is my run polluted? A simulated run scored by the Shiryaev change detector:
+//   p~ = p + (1 - p) * rho;  p' = p~ * L / (p~ * L + 1 - p~),  in log-odds so nothing overflows.
+const Pollution = (() => {
+  const HEALTHY_RATE = 0.02;
+  const BROKEN_RATE = 0.16;
+  const HAZARD = 1e-3;
+  const ALARM = 0.999;
+  const STEPS = 200;
+  const FAULT_STEP = 150;
+  const SHOWN_FROM = 110;
+  const byId = (id) => document.getElementById(id);
+  let seed = 7;
+  let run = null;
+
+  function random(state) {
+    let value = state >>> 0;
+    return () => {
+      value = (value + 0x6D2B79F5) >>> 0;
+      let mixed = Math.imul(value ^ (value >>> 15), value | 1);
+      mixed ^= mixed + Math.imul(mixed ^ (mixed >>> 7), mixed | 61);
+      return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function binomial(next, trials, rate) {
+    let count = 0;
+    for (let index = 0; index < trials; index += 1) if (next() < rate) count += 1;
+    return count;
+  }
+
+  function logLikelihoodRatio(failures, units) {
+    return failures * (Math.log(BROKEN_RATE) - Math.log(HEALTHY_RATE)) +
+      (units - failures) * (Math.log1p(-BROKEN_RATE) - Math.log1p(-HEALTHY_RATE));
+  }
+
+  // log(1 + e^x) without overflow.
+  function softplus(x) {
+    return Math.max(x, 0) + Math.log1p(Math.exp(-Math.abs(x)));
+  }
+
+  // logit(p_n) = logit(p~) + log L, with log(1 - p~) = log(1 - p) + log(1 - rho).
+  function update(logOdds, llr) {
+    const logNotChanged = -softplus(logOdds) + Math.log1p(-HAZARD);
+    const logChanged = Math.log(-Math.expm1(logNotChanged));
+    return logChanged - logNotChanged + llr;
+  }
+
+  function probability(logOdds) {
+    return logOdds >= 0 ? 1 / (1 + Math.exp(-logOdds)) : Math.exp(logOdds) / (1 + Math.exp(logOdds));
+  }
+
+  function simulate(brokenRate, units) {
+    const next = random(seed);
+    const steps = [];
+    let logOdds = -Infinity;
+    let alarm = null;
+    for (let step = 1; step <= STEPS; step += 1) {
+      const failures = binomial(next, units, step < FAULT_STEP ? HEALTHY_RATE : brokenRate);
+      const llr = logLikelihoodRatio(failures, units);
+      logOdds = update(logOdds, llr);
+      const posterior = probability(logOdds);
+      if (alarm === null && posterior >= ALARM) alarm = step;
+      steps.push({ step, failures, llr, posterior });
+    }
+    return { steps, alarm, units };
+  }
+
+  function draw(svg, simulated) {
+    const width = 640;
+    const left = 46;
+    const right = 14;
+    const top = 16;
+    const posteriorHeight = 130;
+    const gap = 26;
+    const failureHeight = 50;
+    const shown = simulated.steps.filter((entry) => entry.step >= SHOWN_FROM);
+    const x = (step) => left + (step - SHOWN_FROM) / (STEPS - SHOWN_FROM) * (width - left - right);
+    const yPosterior = (value) => top + (1 - value) * posteriorHeight;
+    const failureTop = top + posteriorHeight + gap;
+    const maxFailures = Math.max(4, ...shown.map((entry) => entry.failures));
+    const yFailure = (value) => failureTop + failureHeight - value / maxFailures * failureHeight;
+    const path = shown.map((entry, index) => `${index === 0 ? "M" : "L"}${x(entry.step).toFixed(1)},${yPosterior(entry.posterior).toFixed(1)}`).join("");
+    const barWidth = Math.max(1.5, (width - left - right) / shown.length - 1.2);
+    const bars = shown.map((entry) => `<rect x="${(x(entry.step) - barWidth / 2).toFixed(1)}" y="${yFailure(entry.failures).toFixed(1)}" width="${barWidth.toFixed(1)}" height="${(failureTop + failureHeight - yFailure(entry.failures)).toFixed(1)}" fill="${entry.step >= FAULT_STEP ? "#141414" : "#C9C6BE"}"/>`).join("");
+    const ticks = [SHOWN_FROM, 130, FAULT_STEP, 170, 190].map((step) => `<text x="${x(step)}" y="${failureTop + failureHeight + 16}" text-anchor="middle" font-size="11" fill="#5E5E5B" font-family="Courier Prime, monospace">${step}</text>`).join("");
+    const alarm = simulated.alarm === null ? "" :
+      `<circle cx="${x(simulated.alarm)}" cy="${yPosterior(simulated.steps[simulated.alarm - 1].posterior)}" r="5" fill="#C6DDA8" stroke="#141414" stroke-width="1.5"/>`;
+    svg.innerHTML = `
+      <line x1="${left}" x2="${width - right}" y1="${yPosterior(0)}" y2="${yPosterior(0)}" stroke="#E4E3DF"/>
+      <line x1="${left}" x2="${width - right}" y1="${yPosterior(ALARM)}" y2="${yPosterior(ALARM)}" stroke="#141414" stroke-width="1"/>
+      <text x="${width - right}" y="${yPosterior(ALARM) - 5}" text-anchor="end" font-size="11" fill="#141414" font-family="Courier Prime, monospace">alarm at 0.999</text>
+      <text x="${left - 6}" y="${yPosterior(1) + 4}" text-anchor="end" font-size="11" fill="#5E5E5B" font-family="Courier Prime, monospace">1</text>
+      <text x="${left - 6}" y="${yPosterior(0) + 4}" text-anchor="end" font-size="11" fill="#5E5E5B" font-family="Courier Prime, monospace">0</text>
+      <text x="${left}" y="${top - 4}" font-size="11" fill="#5E5E5B" font-family="Courier Prime, monospace">P(run polluted)</text>
+      <line x1="${x(FAULT_STEP)}" x2="${x(FAULT_STEP)}" y1="${top}" y2="${failureTop + failureHeight}" stroke="#A3271C" stroke-width="1"/>
+      <text x="${x(FAULT_STEP) + 5}" y="${top + 12}" font-size="11" fill="#A3271C" font-family="Courier Prime, monospace">fault</text>
+      <path d="${path}" fill="none" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+      ${alarm}
+      <text x="${left}" y="${failureTop - 6}" font-size="11" fill="#5E5E5B" font-family="Courier Prime, monospace">failed rollouts per step</text>
+      ${bars}
+      <line x1="${left}" x2="${width - right}" y1="${failureTop + failureHeight}" y2="${failureTop + failureHeight}" stroke="#141414"/>
+      ${ticks}
+      <rect id="b-hit" x="${left}" y="${top}" width="${width - left - right}" height="${failureTop + failureHeight - top}" fill="transparent"/>`;
+    svg.querySelector("#b-hit").addEventListener("pointermove", (event) => {
+      const box = svg.getBoundingClientRect();
+      const svgX = (event.clientX - box.left) / box.width * width;
+      const step = Math.round(SHOWN_FROM + (svgX - left) / (width - left - right) * (STEPS - SHOWN_FROM));
+      const entry = simulated.steps[Math.min(STEPS, Math.max(SHOWN_FROM, step)) - 1];
+      showStep(entry, simulated.units);
+    });
+  }
+
+  function formatRatio(llr) {
+    const exponent = Math.floor(llr / Math.LN10);
+    const mantissa = Math.exp(llr - exponent * Math.LN10);
+    return Math.abs(exponent) < 3 ? Math.exp(llr).toPrecision(3) : `${mantissa.toFixed(1)} \u00d7 10^${exponent}`;
+  }
+
+  // Four decimals, except that a probability that would round up to 1 is shown as a bound.
+  function formatProbability(value) {
+    return value >= 0.99995 ? "> 0.9999" : value.toFixed(4);
+  }
+
+  function showStep(entry, units) {
+    byId("b-readout").textContent =
+      `step ${entry.step} \u00b7 ${entry.failures} of ${units} failed \u00b7 L = ${formatRatio(entry.llr)} \u00b7 P(polluted) = ${formatProbability(entry.posterior)}`;
+  }
+
+  function refresh() {
+    const brokenRate = Number(byId("b-rate").value);
+    const units = Number(byId("b-units").value);
+    run = simulate(brokenRate, units);
+    draw(byId("b-chart"), run);
+    if (run.alarm === null) {
+      byId("b-verdict").textContent = `no alarm within ${STEPS - FAULT_STEP} steps of the fault. a failure rate this close to healthy needs more evidence.`;
+      showStep(run.steps[STEPS - 1], units);
+      return;
+    }
+    if (run.alarm < FAULT_STEP) {
+      byId("b-verdict").textContent = `false alarm at step ${run.alarm}, before the fault. with these rates that happens in at most 0.1% of runs.`;
+      showStep(run.steps[run.alarm - 1], units);
+      return;
+    }
+    byId("b-verdict").textContent = `fault at step ${FAULT_STEP} \u2192 alarm at step ${run.alarm}, ${run.alarm - FAULT_STEP} ${run.alarm - FAULT_STEP === 1 ? "step" : "steps"} later. stop, fix, resume.`;
+    showStep(run.steps[run.alarm - 1], units);
+  }
+
+  function start() {
+    byId("b-rate").addEventListener("change", refresh);
+    byId("b-units").addEventListener("change", refresh);
+    byId("b-new").addEventListener("click", () => { seed += 1; refresh(); });
+    refresh();
+  }
+
+  return { start, simulate };
+})();
+
+// Savings per incident: gpus x rate x max(0, hours without an alarm - hours to the alarm - recovery hours).
+const Calculator = (() => {
+  const byId = (id) => document.getElementById(id);
+  const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  const rate = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
+
+  function read(id) {
+    const text = byId(id).value.trim();
+    return text.length > 0 ? Number(text) : NaN;
+  }
+
+  function update() {
+    const values = ["c-gpus", "c-rate", "c-without", "c-alert", "c-recover"].map(read);
+    const [gpus, hourly, without, alert, recover] = values;
+    const valid = values.every((value) => Number.isFinite(value) && value >= 0) && Number.isInteger(gpus) && gpus >= 1;
+    byId("c-error").hidden = valid;
+    if (!valid) return;
+    const avoided = Math.max(0, without - alert - recover);
+    byId("c-value").textContent = money.format(gpus * hourly * avoided);
+    byId("c-formula").textContent = `${gpus} gpus \u00d7 ${rate.format(hourly)} per hour \u00d7 ${Number(avoided.toFixed(2))} hours of avoided waste`;
+  }
+
+  function start() {
+    byId("calculator").addEventListener("input", update);
+    byId("calculator").addEventListener("submit", (event) => event.preventDefault());
+    update();
+  }
+
+  return { start };
+})();
+
+// Copy buttons: the clipboard when allowed, otherwise the code is selected for the reader to copy.
+function startCopyButtons() {
+  for (const button of document.querySelectorAll("[data-copy]")) {
+    button.addEventListener("click", () => {
+      const source = document.getElementById(button.dataset.copy);
+      const select = () => {
+        const range = document.createRange();
+        range.selectNodeContents(source);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        button.textContent = "selected";
+      };
+      try {
+        navigator.clipboard.writeText(source.textContent).then(() => { button.textContent = "copied"; }, select);
+      } catch (error) {
+        select();
+      }
+    });
+  }
+}
+
+// Motion: Lenis smooth scrolling, and one glint across each chart's porcelain when it comes into view.
+function startMotion() {
+  const libraries = typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined";
+  if (!libraries) {
+    console.warn("GSAP or ScrollTrigger did not load; the page runs without motion");
+    return;
+  }
+  if (REDUCED_MOTION) return;
+  gsap.registerPlugin(ScrollTrigger);
+  if (typeof Lenis === "undefined") console.warn("Lenis did not load; scrolling stays native");
+  else {
+    const lenis = new Lenis({ autoRaf: false });
+    lenis.on("scroll", ScrollTrigger.update);
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
+    for (const link of document.querySelectorAll('a[href^="#"]')) {
+      link.addEventListener("click", (event) => {
+        const target = document.querySelector(link.getAttribute("href"));
+        if (target === null) return;
+        event.preventDefault();
+        lenis.scrollTo(target, { offset: -56 });
+      });
+    }
+  }
+  for (const chart of document.querySelectorAll("[data-chart]")) {
+    const slabs = chart.querySelectorAll(".slab-bar");
+    ScrollTrigger.create({
+      trigger: chart,
+      start: "top 85%",
+      once: true,
+      onEnter: () => gsap.fromTo(slabs, { "--glint": "-120%" }, { "--glint": "460%", duration: 1.4, ease: "power2.inOut", stagger: 0.12 }),
+    });
+  }
+}
+
+Charts.start();
+Pollution.start();
+Calculator.start();
+startCopyButtons();
+startMotion();
+</script>
+</body>
+</html>
