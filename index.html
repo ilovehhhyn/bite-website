@@ -206,12 +206,19 @@ pre.code .k { font-weight: 700; }
 .reach-button { font-family: var(--typewriter); font-weight: 300; font-size: clamp(1rem, 1.6vw, 1.2rem); text-decoration: none; background: var(--ink); color: var(--paper); border: 1px solid var(--ink); padding: 0.9rem 1.6rem; }
 .reach-button:hover { background: var(--paper); color: var(--ink); }
 
+/* Public auditability: the badge beside its explanation, under the philosophy */
+.audit { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(2rem, 5vw, 4rem); align-items: center; border-top: 1px solid var(--ink); padding-top: clamp(2rem, 4vw, 3rem); }
+.badge { width: min(300px, 72vw); height: auto; justify-self: center; }
+.audit-copy { display: grid; gap: 1rem; min-width: 0; }
+.audit-title { font-family: var(--skinny); font-weight: 200; font-size: clamp(2rem, 4.4vw, 3.4rem); letter-spacing: -0.03em; line-height: 1; }
+.audit-copy > p:not(.note) { font-size: clamp(1.05rem, 1.5vw, 1.25rem); line-height: 1.5; }
+
 /* Footer */
 footer { padding-inline: var(--gutter); }
 .footer-inner { max-width: 1240px; margin: clamp(2rem, 5vw, 4rem) auto 0; padding-block: 2rem 2.5rem; border-top: 1px solid var(--ink); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem 2rem; }
 
 @media (max-width: 900px) {
-  .api, .charts, .tools { grid-template-columns: minmax(0, 1fr); }
+  .api, .charts, .tools, .audit { grid-template-columns: minmax(0, 1fr); }
   .columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stat:nth-child(3) { border-left: 0; }
@@ -278,6 +285,30 @@ footer { padding-inline: var(--gutter); }
     <div class="column big">
       <span class="label">and</span>
       <p>Training should be fun again. You write the reward and the idea. We handle the out-of-memory errors, the placement and the failures.</p>
+    </div>
+  </div>
+  <div class="audit" id="auditability">
+    <svg class="badge" viewBox="0 0 240 240" role="img" aria-label="Badge: nibble verified run, with example fingerprints of the environment and the config">
+      <defs><path id="badge-ring" d="M120,120 m-96,0 a96,96 0 1,1 192,0 a96,96 0 1,1 -192,0"/></defs>
+      <circle cx="120" cy="120" r="114" fill="none" stroke="#141414" stroke-width="1.5"/>
+      <circle cx="120" cy="120" r="80" fill="none" stroke="#141414" stroke-width="1"/>
+      <text font-family="American Typewriter, Courier Prime, monospace" font-weight="300" font-size="13" fill="#141414"><textPath href="#badge-ring" textLength="596" lengthAdjust="spacing">nibble &#183; verified run &#183; public record &#183; nibble &#183; verified run &#183; public record &#183;</textPath></text>
+      <text x="120" y="112" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="200" font-size="34" letter-spacing="-1" fill="#141414">nibble</text>
+      <circle cx="120" cy="127" r="3" fill="#C6DDA8" stroke="#141414" stroke-width="0.8"/>
+      <text x="120" y="148" text-anchor="middle" font-family="Courier Prime, monospace" font-size="10" fill="#5E5E5B">env 4d07e1&#8230;</text>
+      <text x="120" y="161" text-anchor="middle" font-family="Courier Prime, monospace" font-size="10" fill="#5E5E5B">cfg 9b1e2a&#8230;</text>
+    </svg>
+    <div class="audit-copy">
+      <span class="label">public auditability</span>
+      <h3 class="audit-title">a badge of fairness</h3>
+      <p>A lab says its agent broke out of the sandbox. Was that the model, or a door the lab left open? Today nobody outside the lab can check.</p>
+      <p>Every nibble run keeps a record anyone can audit. A sandbox error is recorded as a sandbox error, never as the model's success, and each record is written once and never overwritten. Publish the record, show the badge, and let readers check the claim for themselves.</p>
+      <div class="columns" style="--count: 3">
+        <div class="column rule-top"><span class="label">environment</span><p>A fingerprint (SHA-256) of the exact sandbox and reward code that ran.</p></div>
+        <div class="column rule-top"><span class="label">config</span><p>A fingerprint of every setting, so two runs that share it ran the same way.</p></div>
+        <div class="column rule-top"><span class="label">rollouts</span><p>Every rollout with its outcome: the model's own action, a sandbox error, or a timeout.</p></div>
+      </div>
+      <p class="note">The badge shows what ran and how each rollout ended. It does not prove that a sandbox has no holes; it lets anyone look for them.</p>
     </div>
   </div>
 </section>
